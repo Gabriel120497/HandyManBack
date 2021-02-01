@@ -19,7 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class Reporte implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@NotNull(message = "La identificación del técnico es obligatoria")
