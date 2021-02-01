@@ -23,20 +23,20 @@ public class Reporte implements Serializable {
 	private Long id;
 
 	@NotNull(message = "La identificación del técnico es obligatoria")
-    @Positive(message = "La identificación del técnico debe ser mayor que 0")
+	@Positive(message = "La identificación del técnico debe ser mayor que 0")
 	private Long idTecnico;
 
 	@NotNull(message = "La identificación del servicio es obligatoria")
-    @Positive(message = "La identificación del servicio debe ser mayor que 0")
+	@Positive(message = "La identificación del servicio debe ser mayor que 0")
 	private Long idServicio;
 
 	@DateTimeFormat(pattern = "yyyy-mm-dd hh:mm")
-    @NotNull(message = "La fecha inicio del servicio es obligatoria")
+	@NotNull(message = "La fecha inicio del servicio es obligatoria")
 	@Column(name = "fecha_inicio")
 	private LocalDateTime fechaInicio;
 
 	@DateTimeFormat(pattern = "yyyy-mm-dd hh:mm")
-    @NotNull(message = "La fecha fin del servicio es obligatoria")
+	@NotNull(message = "La fecha fin del servicio es obligatoria")
 	@Column(name = "fecha_fin")
 	private LocalDateTime fechaFin;
 
@@ -79,7 +79,7 @@ public class Reporte implements Serializable {
 	public void setFechaFin(LocalDateTime fechaFin) {
 		this.fechaFin = fechaFin;
 	}
-	
+
 	private static final long serialVersionUID = 1L;
 
 }

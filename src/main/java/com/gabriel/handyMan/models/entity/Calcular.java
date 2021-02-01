@@ -5,8 +5,6 @@ public class Calcular {
 			auxNormal = 0, auxNoche = 0, auxDomingo = 0, maxH = 48;
 	Boolean flag = true;
 
-	
-
 	public Calcular(float hSemana, float hNormal, float hNoche, float hDomingo, float hExtraNormal, float hExtraNocheH,
 			float hExtraDomingo, float auxNormal, float auxNoche, float auxDomingo, float maxH, Boolean flag) {
 		super();

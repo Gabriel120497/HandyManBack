@@ -25,15 +25,9 @@ public class CalcularHorasImpl implements ICalcularHoras {
 			var fechaInicio = reporte.getFechaInicio();
 			var fechaFin = reporte.getFechaFin();
 
-			System.out.println("Obtenemos fehca inicio DB: " + fechaInicio);
-
-			System.out.println("Obtenemos fecha fin DB: " + fechaFin);
-
 			// numero de la semana del año usando java.time
 			int semanaAnioInicio = fechaInicio.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
 			int semanaAnioFin = fechaFin.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
-			
-			System.out.println(semanaAnioInicio);
 
 			// si la hora de inicio y hora fin están en la misma semana
 			if (semanaAnioInicio == numeroSemana && semanaAnioFin == numeroSemana) {
@@ -44,8 +38,7 @@ public class CalcularHorasImpl implements ICalcularHoras {
 				if (respCalculate.gethSemana() < respCalculate.getMaxH()) {// Calculamos horas normales
 
 					resp = calcularHorasTrabajadas(fechaInicio, fechaFin, respCalculate.gethNormal(),
-							respCalculate.gethNoche(), respCalculate
-									.gethDomingo(), respCalculate.getAuxNormal(),
+							respCalculate.gethNoche(), respCalculate.gethDomingo(), respCalculate.getAuxNormal(),
 							respCalculate.getAuxNoche(), respCalculate.getAuxDomingo(), respCalculate.gethSemana(),
 							respCalculate.getFlag(), respCalculate.getMaxH());
 
@@ -60,7 +53,6 @@ public class CalcularHorasImpl implements ICalcularHoras {
 				} else {
 					// Se calculan solo las horas extras
 					respCalculate.setFlag(false);
-					System.out.println("SOLO HORAS EXTRAS");
 					resp = calcularHorasTrabajadas(fechaInicio, fechaFin, respCalculate.gethExtraNormal(),
 							respCalculate.gethExtraNocheH(), respCalculate.gethExtraDomingo(),
 							respCalculate.getAuxNormal(), respCalculate.getAuxNoche(), respCalculate.getAuxDomingo(),
@@ -72,32 +64,25 @@ public class CalcularHorasImpl implements ICalcularHoras {
 					respCalculate.sethExtraDomingo(resp.getAuxDomingo());
 				}
 
-			} else if (semanaAnioInicio == numeroSemana && semanaAnioFin > numeroSemana) { // si empieza el servicio Domingo y
-				// termina un Lunes de la otra semana
-				System.out.println("Inicia Domingo y finaliza Lunes de la siguiente semana");
+				// si empieza el servicio Domingo y termina un Lunes de la otra semana
+			} else if (semanaAnioInicio == numeroSemana && semanaAnioFin > numeroSemana) {
 
 				// obtenemos las horas del domingo
-				float onlySunH = 24 - formatToH(fechaFin, null); // convertimos todo a horas para operar
+				float onlySunH = 24 - formatoEnHoras(fechaFin, null); // convertimos todo a horas para operar
 
-				if (respCalculate.gethSemana() < respCalculate.getMaxH()) {// Si las horas semanales son menores al
-																			// maximo
-																			// de horas semanales definidas
+				// Si las horas semanales son menores al máximo de horas semanales definidas
+				if (respCalculate.gethSemana() < respCalculate.getMaxH()) {
 
-					respCalculate.sethDomingo(respCalculate.gethDomingo() + onlySunH); // acumulamos las horas del
-																						// domingo
-					respCalculate.sethSemana(respCalculate.gethSemana() + onlySunH); // acumulamos el total de horas en
-																						// la
-																						// semana
+					// acumulamos las horas del domingo
+					respCalculate.sethDomingo(respCalculate.gethDomingo() + onlySunH);
+					// acumulamos el total de horas en la semana
+					respCalculate.sethSemana(respCalculate.gethSemana() + onlySunH);
 
 				} else {
 					// Horas extras dominicales
-					respCalculate.sethExtraDomingo(respCalculate.gethExtraDomingo() + onlySunH); // acumulamos las horas
-																									// extras
-																									// dominicales
-					respCalculate.sethSemana(respCalculate.gethSemana() + onlySunH); // acumulamos el total de horas en
-																						// la
-																						// semana
-
+					respCalculate.sethExtraDomingo(respCalculate.gethExtraDomingo() + onlySunH);
+					// Horas en la semana
+					respCalculate.sethSemana(respCalculate.gethSemana() + onlySunH);
 				}
 
 			}
@@ -116,36 +101,23 @@ public class CalcularHorasImpl implements ICalcularHoras {
 	public Calcular calcularHorasTrabajadas(LocalDateTime fechaInicio, LocalDateTime fechaFin, float hNormal,
 			float hNoche, float hDomingo, float auxNormal, float auxNoche, float auxDomingo, float hSemana,
 			boolean flag, float maxH) {
-		// Definimos horarios, solo me importa la hora
-
-		// Forma nueva
-
+		// Definimos horarios
 		LocalTime noI = LocalTime.of(7, 0, 0), noF = LocalTime.of(20, 0, 0), niF = LocalTime.from(noI),
 				niI = LocalTime.from(noF);
 
 		// Formateamos todo a horas
-		float normI = formatToH(null, noI), normF = formatToH(null, noF), nightI = formatToH(null, niI),
-				nightF = formatToH(null, niF);
+		float normI = formatoEnHoras(null, noI), normF = formatoEnHoras(null, noF), nightI = formatoEnHoras(null, niI),
+				nightF = formatoEnHoras(null, niF);
 
-		////////////////////////////////
 		// Transformamos la fecha de inicio y fin en horas
-
-		float startH = formatToH(fechaInicio, null), endH = formatToH(fechaFin, null);
-
-		/////////////////////////////////////////////////////
+		float startH = formatoEnHoras(fechaInicio, null), endH = formatoEnHoras(fechaFin, null);
 
 		var hours = endH - startH; // Horas de trabajo en cada servicio
-
-		/**
-		 * Por si ingresa varios dias seguidos (NO SE IMPLEMENTÓ) var
-		 * days=(fechaFin-fechaInicio)/(1000* 60* 60* 24); // dias que trabajó
-		 */
 
 		if (fechaInicio.getDayOfWeek().getValue() > 0 && fechaFin.getDayOfWeek().getValue() > 0) { // Lunes a Sabado
 
 			// Horario normal
 			if ((startH >= normI && startH < normF) && (endH > normI && endH <= normF)) { /// 7AM a 8 PM
-				System.out.println("Horario normal  7AM a 8 PM");
 				hNormal = hNormal + hours;
 				hSemana = hSemana + hours; // aumentamos las horas semanales
 
@@ -157,13 +129,10 @@ public class CalcularHorasImpl implements ICalcularHoras {
 					hNormal = resp.getHoras();
 				}
 
-			} else if ((startH >= normI && startH < normF) && endH >= nightI) { // // empezó hora normal y termino en
-																				// nocturna del mismo dia (como atienden
-																				// emergencias, se puede dar el caso)
+			} else if ((startH >= normI && startH < normF) && endH >= nightI) { // empezó hora normal y termino en
+																				// nocturna del mismo dia
 
 				// 7AM a 8PM + 8pm a 11pm
-				System.out.println("Horario 7AM a 8PM + 8pm a 11pm");
-
 				// separamos las horas normales de las nocturnas
 				hNormal = hNormal + (nightI - startH);
 				hSemana = hSemana + (nightI - startH);
@@ -187,9 +156,7 @@ public class CalcularHorasImpl implements ICalcularHoras {
 			} else if ((startH >= normI && startH < normF) && endH <= nightF) { // empezó hora hormal y terminó hora
 																				// nocturna del dia siguiente de la
 																				// misma semana
-				System.out.println("7AM a 8PM + 8pm a 12am + 12am a 7am");
 				// 7AM a 8PM + 8pm a 12am + 12am a 7am
-
 				// separamos las horas normales de las nocturnas
 				hNormal = hNormal + (nightI - startH);// normales
 				hSemana = hSemana + (nightI - startH);
@@ -212,10 +179,8 @@ public class CalcularHorasImpl implements ICalcularHoras {
 				}
 			}
 
-			else if ((startH >= nightI && endH > nightI) || (startH >= nightI && endH == 0)) { // Hora nocturna
-				// de 8pm a 12am
-				System.out.println("8pm a 12am");
-
+			else if ((startH >= nightI && endH > nightI) || (startH >= nightI && endH == 0)) {
+				// Hora nocturna de 8pm a 12am
 				if (hours < 0) {
 					hNoche = hNoche + (24 + hours);
 					hSemana = hSemana + (24 + hours);
@@ -237,7 +202,6 @@ public class CalcularHorasImpl implements ICalcularHoras {
 				}
 
 			} else if (startH >= nightI && endH <= nightF) {
-				System.out.println("De 8pm a 7 am");
 				// de 8pm a 7am
 				hNoche = hNoche + (24 - startH) + (endH); // de 8pm a 12am + de 12am a 7am
 				hSemana = hSemana + (24 - startH) + (endH);
@@ -250,7 +214,6 @@ public class CalcularHorasImpl implements ICalcularHoras {
 
 			else if (startH >= nightI && (endH >= normI && endH <= nightI)) {
 				// de 8pm a 8pm del dia sig
-				System.out.println("De 8pm a 8pm del dia sig");
 				hNoche = hNoche + (24 - startH) + 7; // horas nocturnas del dia anterior mas todas del siguiente dia
 				hSemana = hSemana + (24 - startH) + 7;
 
@@ -271,7 +234,6 @@ public class CalcularHorasImpl implements ICalcularHoras {
 			} else if ((startH >= 0 && startH <= normI) && (endH > 0 && endH <= normI)) { // inició y termino de 12 am a
 																							// 7 am del mismo dia
 				// Nocturnas de 12am a 7am
-				System.out.println("De 12am a 7am");
 				hNoche = hNoche + hours;
 				hSemana = hSemana + hours;
 				if (flag) {
@@ -279,12 +241,8 @@ public class CalcularHorasImpl implements ICalcularHoras {
 					auxNoche = resp.getAux();
 					hNoche = resp.getHoras();
 				}
-			} else if ((startH >= 0 && startH <= normI) && (endH > normI && endH <= normF)) { // inició de 12 am y
-																								// terminó al dia
-																								// siguiente en hora
-																								// normal
-				System.out.println("De 12 am a 8pm");
-				// nocturnas
+			} else if ((startH >= 0 && startH <= normI) && (endH > normI && endH <= normF)) {
+				// inició de 12 am y terminó al dia siguiente en hora normal nocturnas
 				hNoche = hNoche + (nightF - startH);
 				hSemana = hSemana + (nightF - startH);
 
@@ -304,7 +262,6 @@ public class CalcularHorasImpl implements ICalcularHoras {
 				}
 
 			} else if ((startH >= 0 && startH <= normI) && (endH >= nightI || endH == 0)) {
-				System.out.println("12am a 12am del sig dia");
 				hNoche = hNoche + (nightF - startH);// nocturnas de 12am hasta 7am
 				hSemana = hSemana + (nightF - startH);
 
@@ -367,7 +324,7 @@ public class CalcularHorasImpl implements ICalcularHoras {
 	}
 
 	@Override
-	public Float formatToH(LocalDateTime dateTime, LocalTime time) {
+	public Float formatoEnHoras(LocalDateTime dateTime, LocalTime time) {
 		if (dateTime != null) {
 			return ((float) (dateTime.getHour()) + (float) (dateTime.getMinute() / 60)
 					+ (float) (dateTime.getSecond() / 3600));
@@ -378,28 +335,28 @@ public class CalcularHorasImpl implements ICalcularHoras {
 
 	@Override
 	public HoraExtra horaExtraTipo1(float hSemana, float aux, float maxH, float horas) {
-		if(hSemana > maxH){
-            aux = hSemana - maxH; // obtenemos las extras
-            horas = horas - aux; // le resto las extras a las normales
-            return new HoraExtra(horas,aux);
-        }
-        return new HoraExtra(horas,aux);
+		if (hSemana > maxH) {
+			aux = hSemana - maxH; // obtenemos las extras
+			horas = horas - aux; // le resto las extras a las normales
+			return new HoraExtra(horas, aux);
+		}
+		return new HoraExtra(horas, aux);
 	}
 
 	@Override
 	public HoraExtra horaExtraTipo2(float hSemana, float aux, float aux2, float maxH, float horas) {
-		if((hSemana > maxH) && aux == 0){
-            aux2 = hSemana - maxH; // obtenemos las extras
-            horas = horas - aux2; // le resto las extras a las normales
+		if ((hSemana > maxH) && aux == 0) {
+			aux2 = hSemana - maxH; // obtenemos las extras
+			horas = horas - aux2; // le resto las extras a las normales
 
-            return new HoraExtra(horas,aux2);
-        }else if((hSemana > maxH) && aux > 0){
-            //solo se tienen en cuenta las extras
-            aux2 = hSemana - aux - maxH; // las semanas menos las extras anteriores menos el tope(48)
-            return new HoraExtra(horas,aux2);
-        }
-        // los devuelve como estaban
-        return new HoraExtra(horas,aux2);
+			return new HoraExtra(horas, aux2);
+		} else if ((hSemana > maxH) && aux > 0) {
+			// solo se tienen en cuenta las extras
+			aux2 = hSemana - aux - maxH; // las semanas menos las extras anteriores menos el tope(48)
+			return new HoraExtra(horas, aux2);
+		}
+		// los devuelve como estaban
+		return new HoraExtra(horas, aux2);
 	}
 
 }

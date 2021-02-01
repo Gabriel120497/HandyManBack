@@ -31,7 +31,8 @@ public class CalcularHorasController {
 	private ICalcularHoras horasTrabajadas;
 	
 	@GetMapping("/calcularHoras")
-	public ResponseEntity<?> calcular(@Valid @RequestParam(value = "tecnicoId") long id, @RequestParam(value = "numeroSemana") int semana) {
+	public ResponseEntity<?> calcular(@Valid @RequestParam(value = "tecnicoId") long id,
+			@RequestParam(value = "numeroSemana") int semana) {
 		Map<String, Object> response = new HashMap<>();
 		List<Reporte> reportesTecnico = reporteService.findByIdTecnico(id);
 		Hora resp = horasTrabajadas.calcular(reportesTecnico, semana);

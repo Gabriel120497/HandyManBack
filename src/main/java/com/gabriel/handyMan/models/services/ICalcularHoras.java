@@ -17,11 +17,11 @@ public interface ICalcularHoras {
 	Calcular calcularHorasTrabajadas(LocalDateTime fechaInicio, LocalDateTime fechaFin, float hNormal, float hNoche,
 			float hDomingo, float auxNormal, float auxNoche, float auxDomingo, float hSemana, boolean flag, float maxH);
 
-	// para las horas extra en un solo turno
+	// para las horas extra en un solo turno (diurno, nocturno, dominical)
 	HoraExtra horaExtraTipo1(float hSemana, float aux, float maxH, float horas);
 
 	// para las horas extra con cambio de turno
 	HoraExtra horaExtraTipo2(float hSemana, float aux, float aux2, float maxH, float horas);
 
-	Float formatToH(LocalDateTime dateTime, LocalTime time);
+	Float formatoEnHoras(LocalDateTime dateTime, LocalTime time);
 }
